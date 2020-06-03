@@ -3,6 +3,9 @@ const path = require('path');
 const Arena = require('./src/server/app');
 const routes = require('./src/server/views/routes');
 
+// Production by default.
+process.env.NODE_ENV = process.env.NODE_ENV || 'production'
+
 function run(config, listenOpts = {}) {
   const {app, Queues} = Arena();
 
@@ -11,8 +14,13 @@ function run(config, listenOpts = {}) {
 
   app.locals.appBasePath = listenOpts.basePath || app.locals.appBasePath;
 
-  app.use(app.locals.appBasePath, express.static(path.join(__dirname, 'public')));
-  app.use(app.locals.appBasePath, routes);
+  if (process.env.NODE_ENV === 'production') {
+    app.use(app.locals.appBasePath, express.static(path.join(__dirname, 'public')));
+    app.use(app.locals.appBasePath, routes);
+  } else {
+    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(routes);
+  }
 
   const port = listenOpts.port || 4567;
   const host= listenOpts.host || 'localhost'; // Default: listen to all network interfaces.

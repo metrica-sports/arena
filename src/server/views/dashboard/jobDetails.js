@@ -4,7 +4,7 @@ const util = require('util');
 async function handler(req, res) {
   const { queueName, queueHost, id } = req.params;
   const { json } = req.query;
-  const basePath = req.baseUrl;
+  const basePath = process.env.NODE_ENV === 'production' ? req.baseUrl : '/arena';
 
   const {Queues} = req.app.locals;
   const queue = await Queues.get(queueName, queueHost);
